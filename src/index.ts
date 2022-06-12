@@ -1,6 +1,9 @@
 import 'reflect-metadata';
-import myDataSource from './dataSource';
 import env from 'dotenv';
+
+import myDataSource from './dataSource';
+import app from './app';
+
 
 env.config();
 
@@ -41,7 +44,9 @@ env.config();
         console.log("===========================================================");
         console.log("NODE_ENV: " + process.env.NODE_ENV);
         console.log("===========================================================");
-        console.log("PORT: " + process.env.PORT);
+        app.listen(process.env.PORT, () => {
+            console.log(`Server is listening on port ${process.env.PORT}`);
+        });
     })
     .catch((err) => {
         console.error("Error during Data Source initialization:", err)
