@@ -1,7 +1,9 @@
-import { NotFoundError } from './error/NotFoundError';
 import cors from 'cors';
 import express from 'express';
+import 'express-async-errors';
+
 import { errorHandler } from './middleware/errorHandler';
+import { NotFoundError } from './error/NotFoundError';
 
 const app = express();
 app.use(express.json());
@@ -16,7 +18,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 app.get('/favicon.ico', (req, res) => res.status(204));
 
 app.all('*', async (req, res) => {
-    throw new NotFoundError()
+    throw new NotFoundError();
 });
 
 app.use(errorHandler);
