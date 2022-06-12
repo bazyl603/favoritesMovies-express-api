@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 app.use(express.json());
@@ -17,5 +18,6 @@ app.all('*', async (req, res) => {
     res.status(404).send('404 Not Found');
 });
 
+app.use(errorHandler);
 
 export default app;
