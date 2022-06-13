@@ -4,6 +4,7 @@ import 'express-async-errors';
 
 import { errorHandler } from './middleware/errorHandler';
 import { NotFoundError } from './error/NotFoundError';
+import router from './Routers/router';
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,9 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
   });
 
 app.get('/favicon.ico', (req, res) => res.status(204));
+
+
+app.use('/', router);
 
 app.all('*', async (req, res) => {
     throw new NotFoundError();
