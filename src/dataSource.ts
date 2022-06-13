@@ -6,7 +6,7 @@ switch(process.env.NODE_ENV){
     case 'development':
         prepareDataSource = {
             type: 'sqlite',
-            database: '../db.sqlite',
+            database: './db.sqlite',
             entities: ["src/entity/*.ts"],
             synchronize: true,
         }
