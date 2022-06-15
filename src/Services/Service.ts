@@ -120,7 +120,6 @@ export class Service implements IService{
                 .where('favorite.name LIKE :search', { search: `%${search}%` })
                 .getManyAndCount();
             
-                console.log(favorites);
             return favorites;
             
         }catch(e){
@@ -134,6 +133,7 @@ export class Service implements IService{
                 .getRepository(Favorite)
                 .createQueryBuilder('favorite')
                 .leftJoinAndSelect('favorite.movies', 'movie')
+                .leftJoinAndSelect('movie.characters', 'character')
                 .where('favorite.id = :id', { id: id })
                 .getOne();
             console.log(favorites);
