@@ -10,6 +10,9 @@ export class Character {
     @Column({unique: true})
     link!: string;
 
+    @Column({unique: true})
+    name!: string;
+
     @ManyToMany(() => Movie, (movie) => movie.characters)
     movies!: Movie[];
 }

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import Excel from 'exceljs';
+import { Response } from "express";
 import { Favorite } from '../entity/Favorite';
 import { Movie } from './../entity/Movie';
 import { Character } from './../entity/Character';
@@ -74,6 +76,14 @@ export class Service implements IService{
                             character = new Character();
                             character.link = eMovie[i].characters[j];
 
+                            const res = await axios.get(eMovie[i].characters[j], {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            character.name = res.data.name;
+
                             const ch = await myDataSource.manager.getRepository(Character).save(character);
                             movie.characters.push(ch);
                             allCharacters.push(ch);
@@ -105,7 +115,7 @@ export class Service implements IService{
         }
     }
 
-    async getFavorites(page: number, search: string) {
+    async getFavorites(page: number, search: string): Promise<[Favorite[], number]> {
         let skip = page - 1;
         if(skip < 0) {
             skip = 0;
@@ -136,11 +146,62 @@ export class Service implements IService{
                 .leftJoinAndSelect('movie.characters', 'character')
                 .where('favorite.id = :id', { id: id })
                 .getOne();
-            console.log(favorites);
+            
             return favorites;
             
         }catch(e){
             throw new Error('database operation error');
+        }
+    }
+
+    async getExcel(id: number, response: Response) {
+        const workbook = new Excel.Workbook();
+        const worksheet = workbook.addWorksheet('Favorite ' + id);
+
+        worksheet.columns = [
+            { header: 'Character', key: 'character', width: 30 },
+            { header: 'Movies', key: 'movies', width: 40 },
+        ];
+
+        worksheet.eachRow((row, rowNumber) => {
+            row.eachCell((cell, colNumber) => {
+                if(rowNumber === 1 || rowNumber === 2 && colNumber === 1) {
+                    cell.style.font = { bold: true };
+                }
+            });
+        });
+
+
+        const favorite = await this.getFavorite(id);
+
+        if(favorite !== null) {
+            const nameCharacter: {character: string, movies: string[]}[] = [];
+            for(let i = 0; i < favorite.movies.length; i++) {
+                for(let j = 0; j < favorite.movies[i].characters.length; j++) {                    
+
+                    let character = nameCharacter.find(c => c.character === favorite.movies[i].characters[j].name);
+                    if(character === undefined || character === null) {
+                        character = {
+                            character: favorite.movies[i].characters[j].name,
+                            movies: [favorite.movies[i].title]
+                        }
+                        nameCharacter.push(character);
+                    }else{
+                        character.movies.push(favorite.movies[i].title);
+                    }
+                }
+            }
+
+           nameCharacter.forEach(character => {
+                worksheet.addRow({
+                    character: character.character,
+                    movies: character.movies.join(', ')
+                });
+            });
+
+            return workbook.xlsx.write(response);
+        }else{
+            throw new Error('No favorite found');
         }
     }
 

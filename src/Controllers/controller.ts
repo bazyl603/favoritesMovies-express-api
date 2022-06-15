@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { NotFoundError } from "../error/NotFoundError";
 import IService from "../Services/IService";
 
+import Excel from 'exceljs';
+
 type ExpressRouteFunc = (req: Request, res: Response, next?: NextFunction) => void | Promise<Response>;
 
 export function films(service: IService): ExpressRouteFunc {
@@ -61,7 +63,7 @@ export function getFavorites(service: IService): ExpressRouteFunc {
 export function getFavorite(service: IService): ExpressRouteFunc {
     return async function(req: Request, res: Response) {
         const id: number = Number(req.params.id);
-        console.log(id);
+
         try{
             const favorite = await service.getFavorite(id);
             if(favorite === undefined || favorite === null) {
@@ -72,5 +74,26 @@ export function getFavorite(service: IService): ExpressRouteFunc {
         }catch(err){
             throw new NotFoundError();
         }
+    }
+}
+
+
+export function getExcel(service: IService): ExpressRouteFunc {
+    return async function(req: Request, res: Response) {
+        let id: any = req.params.id;
+
+        if(id !== undefined) {
+            id = Number(id);
+        }
+
+        if(id === undefined) {
+            throw new NotFoundError();
+        }
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader("Content-Disposition", "attachment; filename=" + `favorite${id}.xlsx`);
+        return service.getExcel(id, res).then(() => {
+                res.status(200).end();
+            });
     }
 }
