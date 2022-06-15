@@ -105,16 +105,43 @@ export class Service implements IService{
         }
     }
 
-    async getFavorites(): Promise<Partial<Favorite[]>> {
+    async getFavorites(page: number, search: string) {
+        let skip = page - 1;
+        if(skip < 0) {
+            skip = 0;
+        }
+        skip = skip * 10;
         try{
-            const favorites = await myDataSource.manager.getRepository(Favorite).find();
+            const favorites = await myDataSource.manager
+                .getRepository(Favorite)
+                .createQueryBuilder('favorite')
+                .skip(skip)
+                .take(10)
+                .where('favorite.name LIKE :search', { search: `%${search}%` })
+                .getManyAndCount();
             
+                console.log(favorites);
             return favorites;
             
         }catch(e){
             throw new Error('database operation error');
         }
+    }
 
+    async getFavorite(id: number): Promise<Favorite | null> {
+        try{
+            const favorites = await myDataSource.manager
+                .getRepository(Favorite)
+                .createQueryBuilder('favorite')
+                .leftJoinAndSelect('favorite.movies', 'movie')
+                .where('favorite.id = :id', { id: id })
+                .getOne();
+            console.log(favorites);
+            return favorites;
+            
+        }catch(e){
+            throw new Error('database operation error');
+        }
     }
 
 }

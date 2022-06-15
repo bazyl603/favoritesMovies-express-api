@@ -29,20 +29,46 @@ export function saveFavorites(service: IService): ExpressRouteFunc {
 
 export function getFavorites(service: IService): ExpressRouteFunc {
     return async function(req: Request, res: Response) {
+        let page: any = req.query.page;
+        let search: string = String(req.query.search);
+        if(page !== undefined) {
+            page = Number(page);
+        }
+
+        if(page < 1 || page === undefined) {
+            page = 1;
+        }
+
+        if(search === 'undefined'){
+            search = '';
+        }
+        console.log(page);
+
         try{
-            const favorite = await service.getFavorites();
-            if(favorite === undefined) {
+            const favorites = await service.getFavorites(page, search);
+            if(favorites === undefined) {
                 throw new NotFoundError();
             }
-
-            const fav = favorite.map(f => {
-                return {
-                    id: f!.id,
-                    name: f!.name
-                }
-            });
             
-            return res.status(200).json({'favorite': fav});
+            return res.status(200).json({'favorite': favorites[0], 'page': page, 'search': search, 'count': favorites[1]});
+        }catch(err){
+            console.log(err);
+            throw new NotFoundError();
+        }
+    }
+}
+
+export function getFavorite(service: IService): ExpressRouteFunc {
+    return async function(req: Request, res: Response) {
+        const id: number = Number(req.params.id);
+        console.log(id);
+        try{
+            const favorite = await service.getFavorite(id);
+            if(favorite === undefined || favorite === null) {
+                throw new NotFoundError();
+            }
+            
+            return res.status(200).json({'favorite': favorite});
         }catch(err){
             throw new NotFoundError();
         }
