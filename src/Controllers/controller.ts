@@ -44,7 +44,6 @@ export function getFavorites(service: IService): ExpressRouteFunc {
         if(search === 'undefined'){
             search = '';
         }
-        console.log(page);
 
         try{
             const favorites = await service.getFavorites(page, search);
