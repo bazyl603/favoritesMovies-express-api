@@ -2,10 +2,10 @@ export interface ResFilms {
   count: number;
   next?: any;
   previous?: any;
-  results: Result[];
+  results: ResultFilm[];
 }
 
-export interface Result {
+export interface ResultFilm {
   title: string;
   episode_id: number;
   opening_crawl: string;

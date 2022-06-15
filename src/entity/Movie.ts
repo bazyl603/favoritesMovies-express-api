@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Character } from "./Character";
 import { Favorite } from './Favorite';
 
@@ -14,9 +14,14 @@ export class Movie {
     @Column({unique: true})
     title!: string;
 
+    @Column({unique: true})
+    eid!: number;
+
     @ManyToMany(() => Favorite, (favorite) => favorite.movies)
-    favorites!: Favorite[];
+    @JoinTable()
+    favorites!: Favorite;
 
     @ManyToMany(() => Character, (character) => character.movies)
+    @JoinTable()
     characters!: Character[];
 }
