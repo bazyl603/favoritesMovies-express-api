@@ -50,5 +50,5 @@ env.config();
     })
     .catch((err) => {
         console.error("Error during Data Source initialization:", err)
-    })
+    });
 })();

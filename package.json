@@ -6,12 +6,12 @@
   "scripts": {
     "build": "rimraf disc && tsc ",
     "dev": "cross-env NODE_ENV=development ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=test jest --watchAll --no-cahce"
   },
   "keywords": [],
   "author": "Łukasz Pietrowski",
   "license": "ISC",
-  "dependencies": {
+  "dependencies": {    
     "@types/rimraf": "^3.0.2",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
@@ -27,11 +27,24 @@
     "typeorm": "^0.3.6"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.1",    
+    "@types/supertest": "^2.0.12",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/node": "^17.0.42",
+    "supertest": "^6.2.3",
+    "ts-jest": "^28.0.5",  
+    "jest": "^28.1.1",
     "sqlite3": "^5.0.8",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3"
-  }
+  },
+  "jest": {
+     "preset": "ts-jest",
+     "testEnvironment": "node",
+     "setupFilesAfterEnv": [
+       "./src/test/setup.ts"
+     ],
+     "testTimeout": 15000
+   }
 }

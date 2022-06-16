@@ -21,6 +21,15 @@ if(process.env.NODE_ENV === 'production') {
   }
 }
 
+if(process.env.NODE_ENV === 'test') {
+  prepareDataSource = {
+    type: 'sqlite',
+    database: ':memory:',
+    entities: ["src/entity/*.*"],
+    synchronize: true,
+  }
+}
+
 
 const myDataSource = new DataSource(prepareDataSource);
 
